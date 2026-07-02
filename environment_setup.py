@@ -115,8 +115,9 @@ if yn.lower() == "y":
     print("Kernel build complete!")
     chdir("arch/x86_64/boot")
     run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"])
+    run(["cp", "bzImage", "../../../../../installer_iso/boot/initramfs/installer/efidata/boot/kernel.img"])
     chdir("../../../../..")
-    print("Copied bzImage to installer_iso/boot/kernel.img.")
+    print("Copied bzImage to installer_iso/boot/kernel.img and efidata/boot/kernel.img.")
 else:
     print("Skipped kernel compilation.")
 
