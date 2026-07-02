@@ -2,6 +2,7 @@ from platform import system
 from subprocess import run
 from os import environ, chdir
 from shutil import copy2
+from pathlib import Path
 
 
 def get_linux_distro():
@@ -61,6 +62,10 @@ run(
         "make",
         "build-essential",
         "cpio",
+        "wget",
+        "flex",
+        "bison",
+        "libssl-dev",
     ]
 )
 run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
@@ -68,11 +73,49 @@ chdir("booterthingy")
 run(["uv", "sync"])
 chdir("..")
 run("uv tool install transpilatron", shell=True)
-copy2("kernel/noodlix-working.config", "kernel/.config")
-yn = input("Type y to compile kernel or n to use default kernel (default n): ")
-if yn.lower() == "y":
-    run(["make", "-C", "kernel"])
-else:
-    print("All done!")
 
-print("Complete")
+# Download and extract Linux 6.1.175 kernel source if not already present
+print("\nChecking for Linux 6.1.175 kernel source...")
+kernel_source_dir = Path("kernel/linux-6.1.175")
+if not kernel_source_dir.exists():
+    print("Linux 6.1.175 source not found. Downloading...")
+    kernel_tar = Path("kernel/linux-6.1.175.tar.xz")
+    
+    # Download the kernel source
+    run(
+        ["wget", "-O", str(kernel_tar), 
+         "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz"],
+        cwd="kernel"
+    )
+    
+    if kernel_tar.exists():
+        print(f"Extracting {kernel_tar.name}...")
+        run(["tar", "xf", str(kernel_tar.name)], cwd="kernel")
+        print("Kernel source extracted successfully.")
+    else:
+        print("ERROR: Failed to download kernel source.")
+        exit(1)
+else:
+    print("Linux 6.1.175 source already present.")
+
+# Copy the config file to the kernel source directory
+config_src = Path("kernel/noodlix-working.config")
+config_dst = Path("kernel/linux-6.1.175/.config")
+if config_src.exists():
+    copy2(config_src, config_dst)
+    print(f"Copied {config_src} to {config_dst}")
+else:
+    print(f"ERROR: Config file not found at {config_src}")
+    exit(1)
+
+yn = input("Type y to compile kernel or n to skip kernel compilation (default n): ")
+if yn.lower() == "y":
+    print("Building kernel (this may take a while)...")
+    chdir("kernel/linux-6.1.175")
+    run(["make", "-j" + str(__import__("os").cpu_count() or 1)])
+    chdir("../..")
+    print("Kernel build complete!")
+else:
+    print("Skipped kernel compilation.")
+
+print("All done! You can now run ./build_iso_full.bash to build the ISO.")
