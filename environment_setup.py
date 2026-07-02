@@ -112,9 +112,11 @@ if yn.lower() == "y":
     print("Building kernel (this may take a while)...")
     chdir("kernel/linux-6.1.175")
     run(["make", "-j" + str(cpu_count() or 1)])
-    chdir("../..")
     print("Kernel build complete!")
-    print("Copy arch/x86_64/boot/bzImage to installer_iso/boot/kernel.img to use it.")
+    chdir("arch/x86_64/boot")
+    run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"])
+    chdir("../../../../..")
+    print("Copied bzImage to installer_iso/boot/kernel.img.")
 else:
     print("Skipped kernel compilation.")
 
