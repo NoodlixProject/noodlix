@@ -3,7 +3,7 @@ noodlix.iso
 noodlix_disk.img
 noodlix_vars.fd
 mkfs.vfat.static
-limine
+/limine
 
 # Upstream source archives
 *.tar.gz
