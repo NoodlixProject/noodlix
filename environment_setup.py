@@ -1,6 +1,6 @@
 from platform import system
 from subprocess import run
-from os import environ, chdir, cpu_count
+from os import environ, chdir, cpu_count, makedirs
 from shutil import copy2
 from pathlib import Path
 
@@ -114,6 +114,8 @@ if yn.lower() == "y":
     run(["make", "-j" + str(cpu_count() or 1)])
     print("Kernel build complete!")
     chdir("arch/x86_64/boot")
+    makedirs("../../../../../installer_iso/boot", exist_ok=True)
+    makedirs("../../../../../installer_iso/boot/initramfs/installer/efidata/boot", exist_ok=True)
     run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"])
     run(["cp", "bzImage", "../../../../../installer_iso/boot/initramfs/installer/efidata/boot/kernel.img"])
     chdir("../../../../..")
