@@ -40,21 +40,41 @@ Select **1 (Boot ISO)** from the QEMU menu, run the installer, then select **2 (
 - Linux kernel build toolchain (gcc, make, flex, bison, etc.) if rebuilding the kernel
 - **SDL** library for QEMU display (`-display sdl` without `gl=on`)
 
-## Architecture
+## Boot Flows
+
+The booterthingy (PID 1) and the installer are separate components. The installer runs from a special ISO — it is **not** present in the installed system.
+
+### Flow 1: Installer ISO
+
+The special ISO that partitions and installs Noodlix to disk.
 
 ```
-UEFI/BIOS → Limine bootloader → Kernel (6.1.175) → initramfs.gz → PID 1 (booterthingy)
-                                                                       ↓
-                                                              Interactive installer
-                                                                       ↓
-                                                          Formats disk (vfat + ext4)
-                                                                       ↓
-                                                          Copies efidata/ + rootdata/
-                                                                       ↓
-                                                              Reboot → Noodlix
+UEFI/BIOS → Limine → Kernel → initramfs.gz → booterthingy (PID 1)
+                                                   ↓
+                                           mounts proc/sys/dev
+                                                   ↓
+                                           launches /installer/main.py
+                                                   ↓
+                                           fdisk → mkfs.vfat → mkfs.ext4
+                                                   ↓
+                                           copies efidata/ → EFI partition
+                                           copies rootdata/ → root partition
+                                                   ↓
+                                           unmounts, reboots
 ```
 
-The booterthingy mounts proc, sysfs, and devtmpfs then hands off to the installer. The installer runs `fdisk` for partitioning, `mkfs.vfat`/`mkfs.ext4` for formatting, copies the EFI payload and root filesystem, then reboots into the installed system.
+### Flow 2: Installed System
+
+After installation, booting from the target disk.
+
+```
+UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → booterthingy (PID 1)
+                                                                       ↓
+                                                               mounts proc/sys/dev
+                                                                       ↓
+                                                               (future: mount rootfs,
+                                                                switch_root to system)
+```
 
 ## Repository Notes
 
