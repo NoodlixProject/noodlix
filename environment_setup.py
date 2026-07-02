@@ -1,6 +1,6 @@
 from platform import system
 from subprocess import run
-from os import environ, chdir
+from os import environ, chdir, cpu_count
 from shutil import copy2
 from pathlib import Path
 
@@ -83,14 +83,13 @@ if not kernel_source_dir.exists():
     
     # Download the kernel source
     run(
-        ["wget", "-O", str(kernel_tar), 
-         "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz"],
-        cwd="kernel"
+        ["wget", "-O", str(kernel_tar),
+         "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz"]
     )
     
     if kernel_tar.exists():
         print(f"Extracting {kernel_tar.name}...")
-        run(["tar", "xf", str(kernel_tar.name)], cwd="kernel")
+        run(["tar", "xf", str(kernel_tar), "-C", "kernel"])
         print("Kernel source extracted successfully.")
     else:
         print("ERROR: Failed to download kernel source.")
@@ -112,9 +111,10 @@ yn = input("Type y to compile kernel or n to skip kernel compilation (default n)
 if yn.lower() == "y":
     print("Building kernel (this may take a while)...")
     chdir("kernel/linux-6.1.175")
-    run(["make", "-j" + str(__import__("os").cpu_count() or 1)])
+    run(["make", "-j" + str(cpu_count() or 1)])
     chdir("../..")
     print("Kernel build complete!")
+    print("Copy arch/x86_64/boot/bzImage to installer_iso/boot/kernel.img to use it.")
 else:
     print("Skipped kernel compilation.")
 
