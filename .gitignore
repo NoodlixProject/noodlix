@@ -4,7 +4,6 @@ noodlix_disk.img
 noodlix_vars.fd
 mkfs.vfat.static
 limine
-installer_iso/
 
 # Upstream source archives
 *.tar.gz
@@ -24,16 +23,6 @@ installer_iso/
 # Installer build artifacts
 installer/build/
 installer/out/
-
-# initramfs build artifacts
-installer_iso/boot/kernel.img
-installer_iso/boot/initramfs.gz
-installer_iso/boot/initramfs/init
-installer_iso/boot/initramfs/bin/fdisk
-installer_iso/boot/initramfs/bin/mkfs.ext4
-installer_iso/boot/initramfs/bin/mkfs.vfat
-installer_iso/boot/initramfs/bin/iw
-installer_iso/boot/initramfs/installer/efidata/boot/kernel.img
 
 # Misc
 setup.sh
