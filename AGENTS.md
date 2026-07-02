@@ -177,7 +177,7 @@ cd installer && python main.py
 
 3. **`system-initramfs/` is empty** — `build_iso_full.bash` copies everything from it, but it's a placeholder with no content yet. The copy step silently succeeds with nothing.
 
-4. **No git repo** — no version control history, no CI/CD, no `.gitignore` at the project root. No automated testing.
+4. **Git repo on GitHub** — tracked at `origin https://github.com/JTSJohnny/noodlix.git`. The repo excludes upstream source trees (`kernel/`, `util-linux-2.40/`, etc.) and large build artifacts via `.gitignore`. Only the kernel config (`kernel/noodlix-working.config`) is tracked from the kernel source. Force-pushed a clean root commit to remove large files from history — don't push large files again.
 
 5. **Static binaries** — `mkfs.vfat.static` lives at the project root. The initramfs needs its own copy at runtime.
 
