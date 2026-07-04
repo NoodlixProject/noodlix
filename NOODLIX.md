@@ -156,7 +156,7 @@ UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → booterth
 ---
 
 ## The Package System
-
+Packages are just a idea. THEY ARE NOT IMPLEMENTED YET.
 ### How packages work
 
 There are no binary packages, no package repositories, no runtime dependencies.
@@ -172,7 +172,7 @@ noodle-hello-world/
 Building:
 
 ```bash
-transpilatron package noodle-hello-world/recipe.toml
+makenoodle noodle-hello-world/recipe.toml
 ```
 
 This produces a static binary. The user places it in the rootfs
@@ -338,7 +338,7 @@ noodlix_core/
    directories for future payloads.
 
 4. **`init` is a transpiled binary** — edit `booterthingy/main.py`, recompile
-   with `transpilatron --minimal main.py -o init`.
+   with `transpilatron --minimal main.py`.
 
 5. **`noodlix_vars.fd`** auto-created by `testinvm.sh` from OVMF vars.
    Requires OVMF UEFI firmware installed on the host.

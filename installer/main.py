@@ -55,7 +55,9 @@ if not os.path.exists(disk):
     print("FATAL: disk not found:", disk)
     sys.exit(1)
 
-print("Please refer to the installation guide on how to use fdisk to set up the correct partition layout")
+print(
+    "Please refer to the installation guide on how to use fdisk to set up the correct partition layout"
+)
 pid = os.fork()
 if pid == 0:
     os.execv("/bin/fdisk", ["/bin/fdisk", disk])
@@ -140,8 +142,6 @@ print("Root partition mounted successfully!")
 _divider()
 print("Let's noodle!")
 _divider()
-
-# Rewrite efidata limine.conf to pass the root partition to the installed system
 limine_conf = "/installer/efidata/boot/limine/limine.conf"
 with open(limine_conf, "r") as f:
     lines = f.readlines()
