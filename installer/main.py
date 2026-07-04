@@ -140,6 +140,25 @@ print("Root partition mounted successfully!")
 _divider()
 print("Let's noodle!")
 _divider()
+
+# Rewrite efidata limine.conf to pass the root partition to the installed system
+limine_conf = "/installer/efidata/boot/limine/limine.conf"
+with open(limine_conf, "r") as f:
+    lines = f.readlines()
+with open(limine_conf, "w") as f:
+    for line in lines:
+        if line.strip().startswith("cmdline:"):
+            line = line.rstrip() + f" drive={root_partition}\n"
+        f.write(line)
+print(f"Set kernel parameter drive={root_partition}")
+
+efi_confirm = input(
+    "WARNING: This will erase all data on the EFI partition! Type 'yes' to continue: "
+).strip()
+if efi_confirm.lower() != "yes":
+    print("Aborting EFI partition setup.")
+    sys.exit(1)
+
 print("Copy the EFI partition...")
 copytree("/installer/efidata", "/mnt/efi", dirs_exist_ok=True)
 print("EFI partition setup complete!")
