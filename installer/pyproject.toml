@@ -1,7 +1,8 @@
 [project]
 name = "installer"
 version = "0.1.0"
-description = "Add your description here"
+license = "AGPL-3.0-or-later"
+description = "Interactive installer for the Noodlix operating system"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
