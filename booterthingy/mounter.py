@@ -66,11 +66,4 @@ def switch_root(newroot: str, init: str):
     os.chdir("/")
     os.chroot(".")
 
-    # Optional: unmount old initramfs mounts
-    for path in ("/proc", "/sys", "/dev"):
-        try:
-            umount(path, MNT_DETACH)
-        except OSError:
-            pass
-
     os.execv(init, [init])
