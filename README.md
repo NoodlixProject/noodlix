@@ -82,3 +82,11 @@ UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → booterth
 - Upstream source trees (`util-linux-2.40/`, `e2fsprogs-1.47.3/`, `iw-6.17/`) are excluded via `.gitignore`.
 - Build artifacts (`noodlix.iso`, `noodlix_disk.img`, `installer_iso/`, etc.) are gitignored.
 - The `.env` file (OpenRouter API key) is gitignored — do not commit.
+
+## License
+
+AGPL-3.0 © 2026 **Johnny Konczal** <johnnytechsys@outlook.com>
+
+This software is primarily licensed under the GNU Affero General Public
+License v3 (AGPL-3.0). The author reserves the right to offer commercial
+licensing for proprietary use cases — contact the author for inquiries.
