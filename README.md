@@ -1,6 +1,12 @@
 # Noodlix Core
 
-A custom x86_64 Linux distribution built from scratch — featuring a custom Linux 6.1.175 kernel, Python-based PID 1 init, an interactive installer, and a Limine bootloader stack. Produces a bootable ISO that partitions disks, creates filesystems, and copies the system onto target hardware.
+A custom x86_64 Linux distribution where every userspace component is written
+in Python and compiled to a fully static native binary via
+[transpilatron](https://github.com/NoodlixProject/transpilatron) — an
+AI-powered Python-to-C transpiler. No CPython runtime on the target.
+
+Produces a bootable ISO with an interactive installer that partitions disks,
+formats vfat/ext4, and copies system data onto the target.
 
 ## Quick Start
 
@@ -9,53 +15,48 @@ A custom x86_64 Linux distribution built from scratch — featuring a custom Lin
 python3 environment_setup.py
 
 # Build the ISO
-./build.sh installer_iso noodlix.iso
+./build_iso_full.bash
 
 # Test in QEMU
 ./testinvm.sh
 ```
 
-Select **1 (Boot ISO)** from the QEMU menu, run the installer, then select **2 (Boot from disk)** to test the installed system.
+Select **1 (Boot ISO)** to launch the installer, then **2 (Boot from disk)**
+to test the installed system.
 
 ## Project Structure
 
 | Path | Purpose |
 |------|---------|
-| `booterthingy/` | Python 3.13 — PID 1 init (compiled to binary via transpilatron). Mounts proc/sys/devtmpfs. |
-| `installer/` | Python 3.14 — interactive installer. Partitions disks, formats vfat/ext4, copies system data. |
-| `limine-binary/` | Limine bootloader (EFI + BIOS binaries) plus `Makefile` to build the `limine` tool. |
-| `kernel/noodlix-working.config` | Custom Linux 6.1.175 kernel config (full kernel source not tracked — download separately). |
-| `build.sh` | Packs initramfs, runs xorriso, installs Limine to produce `noodlix.iso`. |
-| `build_iso_full.bash` | Full workflow — copies system-initramfs, packs, builds ISO. |
+| `booterthingy/` | Python 3.13 — two-stage init for the installed system. `initramfs-stage.py` mounts rootfs and switch_root's to it; `rootfs-stage.py` is a placeholder for the next boot phase. |
+| `installer/` | Python 3.14 — interactive installer. Transpiled to a static binary and placed as `/init` in the initramfs. Partitions disks, formats vfat/ext4, copies system data, reboots. |
+| `limine-binary/` | Limine bootloader (EFI + BIOS binaries) plus Makefile. |
+| `kernel/noodlix-working.config` | Custom Linux 6.1.175 kernel config. |
+| `installer_iso/` | Staging directory for the ISO. Tracks prebuilt kernel, initramfs, and EFI payload. |
+| `system-initramfs/` | Placeholder — copied into the nested initramfs for the installed system. |
+| `system-rootfs/` | Placeholder — copied into rootdata/ for the root filesystem. |
+| `build.sh` | Packs initramfs, runs xorriso, installs Limine → `noodlix.iso`. |
+| `build_iso_full.bash` | Full workflow — copies `system-rootfs/` and `system-initramfs/`, packs initramfs, builds ISO. |
 | `pack_any_initramfs.bash` | Generic cpio+gzip initramfs packer. |
-| `testinvm.sh` | QEMU launcher with interactive menu (ISO boot or disk boot). |
-| `environment_setup.py` | Installs system dependencies, uv, transpilatron, and copies kernel config. |
+| `testinvm.sh` | QEMU launcher — interactive menu for ISO boot or disk boot. |
+| `environment_setup.py` | Installs apt deps, uv, transpilatron, downloads kernel source, builds kernel, copies bzImage. |
 
-## Build Dependencies
+## Architecture
 
-- **QEMU** (`qemu-system-x86_64`) with UEFI firmware (`OVMF`)
-- **xorriso**, **gzip**, **cpio**
-- **Python 3.13** (for booterthingy) and **Python 3.14** (for installer)
-- **transpilatron** — Python-to-C transpiler (install via `uv tool install transpilatron`)
-- Linux kernel build toolchain (gcc, make, flex, bison, etc.) if rebuilding the kernel
-- **SDL** library for QEMU display (`-display sdl` without `gl=on`)
-
-## Boot Flows
-
-The booterthingy (PID 1) and the installer are separate components. The installer runs from a special ISO — it is **not** present in the installed system.
-
-### Flow 1: Installer ISO
+### Boot flow 1: Installer ISO
 
 The special ISO that partitions and installs Noodlix to disk.
 
 ```
-UEFI/BIOS → Limine → Kernel → initramfs.gz → booterthingy (PID 1)
+UEFI/BIOS → Limine → Kernel → initramfs.gz → /init (transpiled installer, static binary)
                                                    ↓
-                                           mounts proc/sys/dev
+                                           mounts proc/sys/dev/tmpfs
                                                    ↓
-                                           launches /installer/main.py
+                                           user picks disk, runs fdisk
                                                    ↓
-                                           fdisk → mkfs.vfat → mkfs.ext4
+                                           formats EFI (vfat) + root (ext4)
+                                                   ↓
+                                           rewrites efidata/limine.conf → adds drive= parameter
                                                    ↓
                                            copies efidata/ → EFI partition
                                            copies rootdata/ → root partition
@@ -63,25 +64,54 @@ UEFI/BIOS → Limine → Kernel → initramfs.gz → booterthingy (PID 1)
                                            unmounts, reboots
 ```
 
-### Flow 2: Installed System
+### Boot flow 2: Installed system
 
-After installation, booting from the target disk.
+After installation, booting from the target disk. The kernel receives
+`drive=/dev/sdXN` from the limine.conf written by the installer.
 
 ```
-UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → booterthingy (PID 1)
-                                                                       ↓
-                                                               mounts proc/sys/dev
-                                                                       ↓
-                                                               (future: mount rootfs,
-                                                                switch_root to system)
+UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → /init
+                                                                      ↓
+                                           mounts proc/sys/dev
+                                                                      ↓
+                                           reads drive= from /proc/cmdline
+                                                                      ↓
+                                           mounts root partition → /mnt/drive
+                                                                      ↓
+                                           calls switch_root("/mnt/drive", "/noodlix/init")
+                                                                      ↓
+                                           (rootfs-stage: next boot phase, not yet implemented)
 ```
+
+### The two-stage init
+
+The booterthingy provides two Python files that each get transpiled to static
+binaries for different boot phases:
+
+1. **`initramfs-stage.py`** — runs inside the initial initramfs. Mounts proc/sys/dev,
+   reads the `drive=` kernel parameter, mounts the real root partition, and
+   calls `switch_root` to hand off to the system on disk.
+2. **`rootfs-stage.py`** — placeholder. Will run as PID 1 after switch_root
+   once the root filesystem has a real init.
+
+## Build Dependencies
+
+- **QEMU** (`qemu-system-x86_64`) with UEFI firmware (`OVMF`)
+- **xorriso**, **gzip**, **cpio**
+- **Python 3.13** (for booterthingy) and **Python 3.14** (for installer)
+- **transpilatron** — install via `uv tool install transpilatron`
+- Linux kernel build toolchain (gcc, make, flex, bison, libssl-dev)
+- **SDL** library for QEMU display
 
 ## Repository Notes
 
-- **Only the kernel config** (`kernel/noodlix-working.config`) is tracked — full kernel source must be downloaded separately (Linux 6.1.175).
-- Upstream source trees (`util-linux-2.40/`, `e2fsprogs-1.47.3/`, `iw-6.17/`) are excluded via `.gitignore`.
-- Build artifacts (`noodlix.iso`, `noodlix_disk.img`, `installer_iso/`, etc.) are gitignored.
-- The `.env` file (OpenRouter API key) is gitignored — do not commit.
+- Only `kernel/noodlix-working.config` is tracked from the kernel source.
+- Upstream source trees (`util-linux-2.40/`, `e2fsprogs-1.47.3/`, `iw-6.17/`)
+  are excluded via `.gitignore`.
+- `installer_iso/` is tracked (prebuilt staging).
+- `.env` (OpenRouter API key) is gitignored — do not commit.
+- `system-initramfs/` and `system-rootfs/` are placeholders — empty on disk
+  but get copied when they have content.
 
 ## License
 
