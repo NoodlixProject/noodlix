@@ -44,7 +44,8 @@ except Exception as e:
 print("Handing off to the drive...")
 
 try:
-    mounter.switch_root("/mnt/drive", "/mnt/drive/noodlix/init")
+    # Path is relative to new root — /mnt/drive becomes /
+    mounter.switch_root("/mnt/drive", "/noodlix/init")
 
 except Exception as e:
     print(f"Failed to pivot root: {e}")
