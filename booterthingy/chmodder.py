@@ -9,16 +9,16 @@ def chmod(path: str, mode: str) -> None:
         mode: Permission string as octal digits, e.g. "755", "644".
 
     Permission digits (each 0-7):
-        Digit | Binary | Permissions
-        ------|--------|------------
-        0     | 000    | ---
-        1     | 001    | --x
-        2     | 010    | -w-
-        3     | 011    | -wx
-        4     | 100    | r--
-        5     | 101    | r-x
-        6     | 110    | rw-
-        7     | 111    | rwx
+        Digit | Permissions
+        ------|------------
+        0     | ---
+        1     | --x
+        2     | -w-
+        3     | -wx
+        4     | r--
+        5     | r-x
+        6     | rw-
+        7     | rwx
 
         A 4th digit sets special bits:
         Digit | Bit
