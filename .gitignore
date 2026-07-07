@@ -24,6 +24,14 @@ mkfs.vfat.static
 installer/build/
 installer/out/
 
+# Booterthingy build artifacts
+booterthingy/build/
+booterthingy/out/
+
+# Nested initramfs build outputs (generated during ISO build)
+installer_iso/boot/initramfs/installer/efidata/boot/initramfs.gz
+installer_iso/boot/initramfs/installer/efidata/initramfs.img
+
 # Misc
 setup.sh
 
