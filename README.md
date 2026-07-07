@@ -1,12 +1,8 @@
 # Noodlix Core
 
-A custom x86_64 Linux distribution where every userspace component is written
-in Python and compiled to a fully static native binary via
-[transpilatron](https://github.com/NoodlixProject/transpilatron) — an
-AI-powered Python-to-C transpiler. No CPython runtime on the target.
-
-Produces a bootable ISO with an interactive installer that partitions disks,
-formats vfat/ext4, and copies system data onto the target.
+A custom x86_64 Linux distribution with a transpiled Python init, interactive
+fdisk-based installer, and zero runtime dependencies beyond the kernel.
+No systemd, no BusyBox.
 
 ## Quick Start
 
@@ -79,8 +75,9 @@ UEFI/BIOS → Limine (on EFI partition) → Kernel → initramfs.gz → /init
                                            mounts root partition → /mnt/drive
                                                                       ↓
                                            calls switch_root("/mnt/drive", "/noodlix/init")
+                                           (pivot_root + lazy umount frees initramfs from RAM)
                                                                       ↓
-                                           (rootfs-stage: next boot phase, not yet implemented)
+                                           (rootfs-stage: PID 1 on installed root, not yet implemented)
 ```
 
 ### The two-stage init
