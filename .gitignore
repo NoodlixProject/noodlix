@@ -20,6 +20,9 @@ mkfs.vfat.static
 /kernel/
 !kernel/noodlix-working.config
 
+# Build artifacts
+build/
+
 # Nested initramfs build outputs (generated during ISO build)
 installer_iso/boot/initramfs/installer/efidata/boot/initramfs.gz
 installer_iso/boot/initramfs/installer/efidata/initramfs.img
