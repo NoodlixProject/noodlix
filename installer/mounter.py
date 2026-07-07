@@ -20,7 +20,18 @@ libc.umount2.argtypes = [
 ]
 libc.umount2.restype = ctypes.c_int
 
+# syscall() — generic syscall wrapper for pivot_root
+libc.syscall.argtypes = [
+    ctypes.c_long,  # syscall number
+    ctypes.c_char_p,  # arg1 (new_root)
+    ctypes.c_char_p,  # arg2 (put_old)
+]
+libc.syscall.restype = ctypes.c_long
+
 MS_MOVE = 8192
+
+# pivot_root syscall number on x86_64
+SYS_pivot_root = 155
 
 MNT_FORCE = 1
 MNT_DETACH = 2
@@ -55,15 +66,28 @@ def umount(target: str, flags: int = 0):
         raise OSError(errno, os.strerror(errno))
 
 
-def switch_root(newroot: str, init: str):
-    os.chdir(newroot)
-
-    # Move the mounted new root onto /
-    if libc.mount(b".", b"/", None, ctypes.c_ulong(MS_MOVE), None) != 0:
+def pivot_root(new_root: str, put_old: str):
+    ret = libc.syscall(
+        SYS_pivot_root,
+        new_root.encode(),
+        put_old.encode(),
+    )
+    if ret != 0:
         errno = ctypes.get_errno()
         raise OSError(errno, os.strerror(errno))
 
+
+def switch_root(newroot: str, init: str):
+    # Create mount point for old root inside new root
+    put_old = os.path.join(newroot, ".old_root")
+    os.makedirs(put_old, exist_ok=True)
+
+    # Swap mounts: newroot becomes /, old root goes to put_old
+    pivot_root(newroot, put_old)
+
     os.chdir("/")
-    os.chroot(".")
+
+    # Unmount the old initramfs root — lazy is fine, it frees the RAM
+    umount("/.old_root", MNT_DETACH)
 
     os.execv(init, [init])

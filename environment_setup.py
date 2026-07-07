@@ -31,7 +31,7 @@ elif system() == "Darwin":
     exit(1)
 else:
     print(
-        f"ERROR: Unrecognized operating system ({system()}). This tool requires a Debian or Ubuntu-based Linux distribution. Heeeeeeey. Are you running this on Noodlix itself? Clever."
+        f"ERROR: Unrecognized operating system ({system()}). This tool requires a Debian or Ubuntu-based Linux distribution. Heeeeeeey. Are you running this on Noodlix itself? Clever. But it dosent work."
     )
     exit(1)
 
@@ -80,13 +80,17 @@ kernel_source_dir = Path("kernel/linux-6.1.175")
 if not kernel_source_dir.exists():
     print("Linux 6.1.175 source not found. Downloading...")
     kernel_tar = Path("kernel/linux-6.1.175.tar.xz")
-    
+
     # Download the kernel source
     run(
-        ["wget", "-O", str(kernel_tar),
-         "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz"]
+        [
+            "wget",
+            "-O",
+            str(kernel_tar),
+            "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz",
+        ]
     )
-    
+
     if kernel_tar.exists():
         print(f"Extracting {kernel_tar.name}...")
         run(["tar", "xf", str(kernel_tar), "-C", "kernel"])
@@ -115,11 +119,22 @@ if yn.lower() == "y":
     print("Kernel build complete!")
     chdir("arch/x86_64/boot")
     makedirs("../../../../../installer_iso/boot", exist_ok=True)
-    makedirs("../../../../../installer_iso/boot/initramfs/installer/efidata/boot", exist_ok=True)
+    makedirs(
+        "../../../../../installer_iso/boot/initramfs/installer/efidata/boot",
+        exist_ok=True,
+    )
     run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"])
-    run(["cp", "bzImage", "../../../../../installer_iso/boot/initramfs/installer/efidata/boot/kernel.img"])
+    run(
+        [
+            "cp",
+            "bzImage",
+            "../../../../../installer_iso/boot/initramfs/installer/efidata/boot/kernel.img",
+        ]
+    )
     chdir("../../../../..")
-    print("Copied bzImage to installer_iso/boot/kernel.img and efidata/boot/kernel.img.")
+    print(
+        "Copied bzImage to installer_iso/boot/kernel.img and efidata/boot/kernel.img."
+    )
 else:
     print("Skipped kernel compilation.")
 
