@@ -10,6 +10,7 @@ mkfs.vfat.static
 *.tar.xz
 *.tar.bz2
 *.zip
+*.gz
 
 # Upstream source trees (not tracked — just references for building)
 /util-linux-2.40/
@@ -29,6 +30,7 @@ installer_iso/boot/initramfs/installer/efidata/initramfs.img
 
 # Misc
 setup.sh
+limine
 
 # Python
 __pycache__/
