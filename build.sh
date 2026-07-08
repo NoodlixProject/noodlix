@@ -26,6 +26,7 @@ xorriso -as mkisofs \
     "$ISO_DIR"
 
 echo "==> Installing Limine BIOS bootloader..."
+cp limine-binary/limine ./limine
 ./limine bios-install "$ISO_OUT"
 
 echo "==> Done! $ISO_OUT ready."
