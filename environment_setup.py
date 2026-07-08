@@ -67,6 +67,8 @@ run(
         "flex",
         "bison",
         "libssl-dev",
+        "libelf-dev",
+        "bc",
     ]
 )
 run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
@@ -116,7 +118,7 @@ yn = input("Type y to compile kernel or n to skip kernel compilation (default n)
 if yn.lower() == "y":
     print("Building kernel (this may take a while)...")
     chdir("kernel/linux-6.1.177")
-    run(["make", "-j" + str(cpu_count() or 1)])
+    run(["make", "-j" + str(cpu_count() or 1)], check=True)
     print("Kernel build complete!")
     chdir("arch/x86_64/boot")
     makedirs("../../../../../installer_iso/boot", exist_ok=True)
@@ -124,13 +126,14 @@ if yn.lower() == "y":
         "../../../../../installer_iso/boot/initramfs/installer/efidata/boot",
         exist_ok=True,
     )
-    run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"])
+    run(["cp", "bzImage", "../../../../../installer_iso/boot/kernel.img"], check=True)
     run(
         [
             "cp",
             "bzImage",
             "../../../../../installer_iso/boot/initramfs/installer/efidata/boot/kernel.img",
-        ]
+        ],
+        check=True,
     )
     chdir("../../../../..")
     print(
