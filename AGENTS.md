@@ -13,7 +13,7 @@ noodlix_core/
 ├── pack_any_initramfs.bash      # Generic cpio+gzip initramfs packer (idempotent utility)
 ├── testinvm.sh                  # QEMU launcher: interactive menu (installer ISO or disk boot)
 │
-├── kernel/                      # Linux 6.1.175 source, x86_64, custom io_uring modifications
+├── kernel/                      # Linux 6.1.177 source, x86_64, custom io_uring modifications
 │   └── noodlix-working.config   # Kernel .config (138KB)
 │
 ├── booterthingy/                # Python 3.13 — minimal PID 1 init (compiled to binary via transpilatron)
@@ -163,9 +163,9 @@ cd installer && python main.py
 - `testinvm.sh` uses interactive `read` for menu selection
 
 ### Kernel
-- Linux 6.1.175, arch `x86_64` (with `x86_64_defconfig`)
+- Linux 6.1.177, arch `x86_64` (with `x86_64_defconfig`)
 - Custom config at `kernel/noodlix-working.config`
-- Custom modifications in `kernel/io_uring/` (compare against upstream 6.1.175)
+- Custom modifications in `kernel/io_uring/` (compare against upstream 6.1.177)
 
 ---
 

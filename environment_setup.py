@@ -74,12 +74,12 @@ run(["uv", "sync"])
 chdir("..")
 run("uv tool install transpilatron", shell=True)
 
-# Download and extract Linux 6.1.175 kernel source if not already present
-print("\nChecking for Linux 6.1.175 kernel source...")
-kernel_source_dir = Path("kernel/linux-6.1.175")
+# Download and extract Linux 6.1.177 kernel source if not already present
+print("\nChecking for Linux 6.1.177 kernel source...")
+kernel_source_dir = Path("kernel/linux-6.1.177")
 if not kernel_source_dir.exists():
-    print("Linux 6.1.175 source not found. Downloading...")
-    kernel_tar = Path("kernel/linux-6.1.175.tar.xz")
+    print("Linux 6.1.177 source not found. Downloading...")
+    kernel_tar = Path("kernel/linux-6.1.177.tar.xz")
 
     # Download the kernel source
     run(
@@ -87,7 +87,7 @@ if not kernel_source_dir.exists():
             "wget",
             "-O",
             str(kernel_tar),
-            "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.175.tar.xz",
+            "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.177.tar.xz",
         ]
     )
 
@@ -99,11 +99,11 @@ if not kernel_source_dir.exists():
         print("ERROR: Failed to download kernel source.")
         exit(1)
 else:
-    print("Linux 6.1.175 source already present.")
+    print("Linux 6.1.177 source already present.")
 
 # Copy the config file to the kernel source directory
 config_src = Path("kernel/noodlix-working.config")
-config_dst = Path("kernel/linux-6.1.175/.config")
+config_dst = Path("kernel/linux-6.1.177/.config")
 if config_src.exists():
     copy2(config_src, config_dst)
     print(f"Copied {config_src} to {config_dst}")
@@ -114,7 +114,7 @@ else:
 yn = input("Type y to compile kernel or n to skip kernel compilation (default n): ")
 if yn.lower() == "y":
     print("Building kernel (this may take a while)...")
-    chdir("kernel/linux-6.1.175")
+    chdir("kernel/linux-6.1.177")
     run(["make", "-j" + str(cpu_count() or 1)])
     print("Kernel build complete!")
     chdir("arch/x86_64/boot")

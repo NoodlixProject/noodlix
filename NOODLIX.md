@@ -46,7 +46,7 @@ No CPython runtime.
                           │         Installer ISO (55MB)         │
                           │  ┌────────────────────────────────┐ │
                           │  │ Limine bootloader               │ │
-                          │  │ Linux 6.1.175 kernel            │ │
+                          │  │ Linux 6.1.177 kernel            │ │
                           │  │ initramfs.gz:                   │ │
                           │  │   ├── init (static, PID 1)      │ │
                           │  │   ├── /installer/main.py        │ │
@@ -101,7 +101,7 @@ Flow:
 5. Copies `rootdata/` → root partition
 6. Unmounts, reboots
 
-### Kernel — Linux 6.1.175
+### Kernel — Linux 6.1.177
 
 Custom build with:
 - x86_64 architecture
@@ -225,7 +225,7 @@ python3 environment_setup.py
 ### Reproducibility
 
 Every build starts from `installer_iso/` which is tracked in git. The
-`environment_setup.py` downloads the same kernel version (6.1.175) and applies
+`environment_setup.py` downloads the same kernel version (6.1.177) and applies
 the same config. The initramfs is rebuilt from the same `init` binary. The ISO
 output is deterministic with xorriso.
 
@@ -263,7 +263,7 @@ noodlix_core/
 │   └── system-rootfs/            # Copied into rootdata/
 │
 ├── Upstream source trees (untracked, excluded via .gitignore)
-│   ├── kernel/                   # Full Linux 6.1.175 source
+│   ├── kernel/                   # Full Linux 6.1.177 source
 │   ├── util-linux-2.40/
 │   ├── e2fsprogs-1.47.3/
 │   └── iw-6.17/

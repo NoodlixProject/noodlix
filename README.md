@@ -27,7 +27,7 @@ to test the installed system.
 | `booterthingy/` | Python 3.13 — two-stage init for the installed system. `initramfs-stage.py` mounts rootfs and switch_root's to it; `rootfs-stage.py` is a placeholder for the next boot phase. |
 | `installer/` | Python 3.14 — interactive installer. Transpiled to a static binary and placed as `/init` in the initramfs. Partitions disks, formats vfat/ext4, copies system data, reboots. |
 | `limine-binary/` | Limine bootloader (EFI + BIOS binaries) plus Makefile. |
-| `kernel/noodlix-working.config` | Custom Linux 6.1.175 kernel config. |
+| `kernel/noodlix-working.config` | Custom Linux 6.1.177 kernel config. |
 | `installer_iso/` | Staging directory for the ISO. Tracks prebuilt kernel, initramfs, and EFI payload. |
 | `system-initramfs/` | Placeholder — copied into the nested initramfs for the installed system. |
 | `system-rootfs/` | Placeholder — copied into rootdata/ for the root filesystem. |
