@@ -166,13 +166,13 @@ A "noodle" (package) is a recipe and Python source:
 ```
 noodle-hello-world/
 ├── source/main.py       # Python code
-└── recipe.toml          # metadata, deps, flags
+└── noodle.toml          # metadata, deps, flags
 ```
 
 Building:
 
 ```bash
-makenoodle noodle-hello-world/recipe.toml
+makenoodle noodle-hello-world/recipe.toml # nonexistint. will work on it.
 ```
 
 This produces a static binary. The user places it in the rootfs
