@@ -175,9 +175,7 @@ Building:
 makenoodle noodle-hello-world/recipe.toml # nonexistint. will work on it.
 ```
 
-This produces a static binary. The user places it in the rootfs
-(`system-rootfs/`) or initramfs directly. The build script includes it in the
-ISO.
+This produces a static binary. The packatron tool installs it in the system.
 
 ### Transpilatron
 
