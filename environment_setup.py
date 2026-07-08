@@ -150,4 +150,4 @@ run(["cp", "limine", ".."], check=True)
 chdir("..")
 print("Limine bootloader built.")
 
-print("All done!")
+print("All done! You can now run ./build_iso_full.bash to build the ISO.")
