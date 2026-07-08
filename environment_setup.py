@@ -142,4 +142,12 @@ if yn.lower() == "y":
 else:
     print("Skipped kernel compilation.")
 
+# Build Limine bootloader binary
+print("\nBuilding Limine bootloader...")
+chdir("limine-binary")
+run(["make"], check=True)
+run(["cp", "limine", ".."], check=True)
+chdir("..")
+print("Limine bootloader built.")
+
 print("All done! You can now run ./build_iso_full.bash to build the ISO.")
