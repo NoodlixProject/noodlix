@@ -48,6 +48,7 @@ if (
     exit(1)
 
 print("Environment check passed. Let's cook noodles.")
+environ["DEBIAN_FRONTEND"] = "noninteractive"
 run(["sudo", "apt", "update"])
 run(["sudo", "apt", "upgrade", "-y"])
 run(["sudo", "apt", "update"])
