@@ -106,7 +106,6 @@ binaries for different boot phases:
 - Upstream source trees (`util-linux-2.40/`, `e2fsprogs-1.47.3/`, `iw-6.17/`)
   are excluded via `.gitignore`.
 - `installer_iso/` is tracked (prebuilt staging).
-- `.env` (OpenRouter API key) is gitignored — do not commit.
 - `system-initramfs/` and `system-rootfs/` are placeholders — empty on disk
   but get copied when they have content.
 
