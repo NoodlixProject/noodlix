@@ -165,7 +165,6 @@ cd installer && python main.py
 ### Kernel
 - Linux 6.1.177, arch `x86_64` (with `x86_64_defconfig`)
 - Custom config at `kernel/noodlix-working.config`
-- Custom modifications in `kernel/io_uring/` (compare against upstream 6.1.177)
 
 ---
 
